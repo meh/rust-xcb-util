@@ -1,0 +1,18 @@
+[package]
+name    = "xcb-util"
+version = "0.1.0"
+
+authors = ["meh. <meh@schizofreni.co>"]
+license = "MIT"
+
+description = "Rust bindings and wrappers for XCB utility functions."
+repository  = "https://github.com/meh/rust-xcb-util"
+keywords    = ["x11", "xcb"]
+
+[dependencies]
+libc = "0.2"
+xcb  = "0.7"
+
+[features]
+static = []
+icccm  = []
