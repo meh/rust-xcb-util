@@ -8,35 +8,8 @@ use xcb;
 use xcb::ffi::*;
 use ffi::icccm::*;
 
-pub struct GetTextPropertyCookie(xcb::GetPropertyCookie,
-	unsafe extern "C" fn(*mut xcb_connection_t, xcb_get_property_cookie_t, *mut xcb_icccm_get_text_property_reply_t, *mut *mut xcb_generic_error_t) -> u8);
-
-impl GetTextPropertyCookie {
-	pub fn get_reply(&self) -> Result<GetTextPropertyReply, xcb::GenericError> {
-		unsafe {
-			if self.0.checked {
-				let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-				let mut reply = mem::uninitialized();
-				self.1(self.0.conn, self.0.cookie, &mut reply, &mut err);
-
-				if err.is_null() {
-					Ok(GetTextPropertyReply(reply))
-				}
-				else {
-					Err(xcb::GenericError { ptr: err })
-				}
-			}
-			else {
-				let mut reply = mem::uninitialized();
-				self.1(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
-
-				Ok(GetTextPropertyReply(reply))
-			}
-		}
-	}
-}
-
-pub struct GetTextPropertyReply(xcb_icccm_get_text_property_reply_t);
+define!(cookie GetTextPropertyCookie for xcb_icccm_get_text_property_reply_t => GetTextPropertyReply);
+define!(reply GetTextPropertyReply for xcb_icccm_get_text_property_reply_t with xcb_icccm_get_text_property_reply_wipe);
 
 impl GetTextPropertyReply {
 	pub fn encoding(&self) -> xcb::Atom {
@@ -52,14 +25,6 @@ impl GetTextPropertyReply {
 
 	pub fn format(&self) -> u8 {
 		self.0.format
-	}
-}
-
-impl Drop for GetTextPropertyReply {
-	fn drop(&mut self) {
-		unsafe {
-			xcb_icccm_get_text_property_reply_wipe(&mut self.0);
-		}
 	}
 }
 
@@ -188,47 +153,13 @@ pub fn get_wm_icon_name_unchecked(c: &xcb::Connection, window: xcb::Window) -> G
 	}
 }
 
-pub struct GetWMColormapWindowsCookie(xcb::GetPropertyCookie);
-
-impl GetWMColormapWindowsCookie {
-	pub fn get_reply(&self) -> Result<GetWMColormapWindowsReply, xcb::GenericError> {
-		unsafe {
-			if self.0.checked {
-				let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_colormap_windows_reply(self.0.conn, self.0.cookie, &mut reply, &mut err);
-
-				if err.is_null() {
-					Ok(GetWMColormapWindowsReply(reply))
-				}
-				else {
-					Err(xcb::GenericError { ptr: err })
-				}
-			}
-			else {
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_colormap_windows_reply(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
-
-				Ok(GetWMColormapWindowsReply(reply))
-			}
-		}
-	}
-}
-
-pub struct GetWMColormapWindowsReply(xcb_icccm_get_wm_colormap_windows_reply_t);
+define!(cookie GetWMColormapWindowsCookie with xcb_icccm_get_wm_colormap_windows_reply => GetWMColormapWindowsReply);
+define!(reply GetWMColormapWindowsReply for xcb_icccm_get_wm_colormap_windows_reply_t with xcb_icccm_get_wm_colormap_windows_reply_wipe);
 
 impl GetWMColormapWindowsReply {
 	pub fn windows(&self) -> &[xcb::Window] {
 		unsafe {
 			slice::from_raw_parts(self.0.windows as *mut xcb::Window, self.0.windows_len as usize)
-		}
-	}
-}
-
-impl Drop for GetWMColormapWindowsReply {
-	fn drop(&mut self) {
-		unsafe {
-			xcb_icccm_get_wm_colormap_windows_reply_wipe(&mut self.0);
 		}
 	}
 }
@@ -343,34 +274,8 @@ pub fn get_wm_client_machine_unchecked(c: &xcb::Connection, window: xcb::Window)
 	}
 }
 
-pub struct GetWMClassCookie(xcb::GetPropertyCookie);
-
-impl GetWMClassCookie {
-	pub fn get_reply(&self) -> Result<GetWMClassReply, xcb::GenericError> {
-		unsafe {
-			if self.0.checked {
-				let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_class_reply(self.0.conn, self.0.cookie, &mut reply, &mut err);
-
-				if err.is_null() {
-					Ok(GetWMClassReply(reply))
-				}
-				else {
-					Err(xcb::GenericError { ptr: err })
-				}
-			}
-			else {
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_class_reply(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
-
-				Ok(GetWMClassReply(reply))
-			}
-		}
-	}
-}
-
-pub struct GetWMClassReply(xcb_icccm_get_wm_class_reply_t);
+define!(cookie GetWMClassCookie with xcb_icccm_get_wm_class_reply => GetWMClassReply);
+define!(reply GetWMClassReply for xcb_icccm_get_wm_class_reply_t with xcb_icccm_get_wm_class_reply_wipe);
 
 impl GetWMClassReply {
 	pub fn instance(&self) -> &str {
@@ -382,14 +287,6 @@ impl GetWMClassReply {
 	pub fn class(&self) -> &str {
 		unsafe {
 			CStr::from_ptr(self.0.class_name).to_str().unwrap()
-		}
-	}
-}
-
-impl Drop for GetWMClassReply {
-	fn drop(&mut self) {
-		unsafe {
-			xcb_icccm_get_wm_class_reply_wipe(&mut self.0);
 		}
 	}
 }
@@ -495,7 +392,6 @@ impl SizeHints {
 			None
 		}
 	}
-
 
 	pub fn resize(&self) -> Option<(i32, i32)> {
 		if self.0.flags & XCB_ICCCM_SIZE_HINT_P_RESIZE_INC == 1 {
@@ -604,32 +500,7 @@ impl SizeHintsBuilder {
 	}
 }
 
-pub struct GetWMSizeHintsCookie(xcb::GetPropertyCookie);
-
-impl GetWMSizeHintsCookie {
-	pub fn get_reply(&self) -> Result<SizeHints, xcb::GenericError> {
-		unsafe {
-			if self.0.checked {
-				let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_size_hints_reply(self.0.conn, self.0.cookie, &mut reply, &mut err);
-
-				if err.is_null() {
-					Ok(SizeHints(reply))
-				}
-				else {
-					Err(xcb::GenericError { ptr: err })
-				}
-			}
-			else {
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_size_hints_reply(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
-
-				Ok(SizeHints(reply))
-			}
-		}
-	}
-}
+define!(cookie GetWMSizeHintsCookie with xcb_icccm_get_wm_size_hints_reply => SizeHints);
 
 pub fn set_wm_size_hints(c: &xcb::Connection, window: xcb::Window, property: xcb::Atom, hints: &SizeHints) -> xcb::VoidCookie {
 	unsafe {
@@ -910,32 +781,7 @@ impl WMHintsBuilder {
 	}
 }
 
-pub struct GetWMHintsCookie(xcb::GetPropertyCookie);
-
-impl GetWMHintsCookie {
-	pub fn get_reply(&self) -> Result<WMHints, xcb::GenericError> {
-		unsafe {
-			if self.0.checked {
-				let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_hints_reply(self.0.conn, self.0.cookie, &mut reply, &mut err);
-
-				if err.is_null() {
-					Ok(WMHints(reply))
-				}
-				else {
-					Err(xcb::GenericError { ptr: err })
-				}
-			}
-			else {
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_hints_reply(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
-
-				Ok(WMHints(reply))
-			}
-		}
-	}
-}
+define!(cookie GetWMHintsCookie with xcb_icccm_get_wm_hints_reply => WMHints);
 
 pub fn set_wm_hints(c: &xcb::Connection, window: xcb::Window, hints: &WMHints) -> xcb::VoidCookie {
 	unsafe {
@@ -989,47 +835,13 @@ pub fn get_wm_hints_unchecked(c: &xcb::Connection, window: xcb::Window) -> GetWM
 	}
 }
 
-pub struct GetWMProtocolsCookie(xcb::GetPropertyCookie);
-
-impl GetWMProtocolsCookie {
-	pub fn get_reply(&self) -> Result<GetWMProtocolsReply, xcb::GenericError> {
-		unsafe {
-			if self.0.checked {
-				let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_protocols_reply(self.0.conn, self.0.cookie, &mut reply, &mut err);
-
-				if err.is_null() {
-					Ok(GetWMProtocolsReply(reply))
-				}
-				else {
-					Err(xcb::GenericError { ptr: err })
-				}
-			}
-			else {
-				let mut reply = mem::uninitialized();
-				xcb_icccm_get_wm_protocols_reply(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
-
-				Ok(GetWMProtocolsReply(reply))
-			}
-		}
-	}
-}
-
-pub struct GetWMProtocolsReply(xcb_icccm_get_wm_protocols_reply_t);
+define!(cookie GetWMProtocolsCookie with xcb_icccm_get_wm_protocols_reply => GetWMProtocolsReply);
+define!(reply GetWMProtocolsReply for xcb_icccm_get_wm_protocols_reply_t with xcb_icccm_get_wm_protocols_reply_wipe);
 
 impl GetWMProtocolsReply {
 	pub fn atoms(&self) -> &[xcb::Atom] {
 		unsafe {
 			slice::from_raw_parts(self.0.atoms as *mut xcb::Atom, self.0.atoms_len as usize)
-		}
-	}
-}
-
-impl Drop for GetWMProtocolsReply {
-	fn drop(&mut self) {
-		unsafe {
-			xcb_icccm_get_wm_protocols_reply_wipe(&mut self.0);
 		}
 	}
 }

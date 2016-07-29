@@ -3,7 +3,8 @@ use libc::{c_char, c_int};
 
 #[repr(C)]
 pub struct xcb_icccm_get_text_property_reply_t {
-	pub _reply: *mut xcb_get_property_reply_t,
+	_reply: *mut xcb_get_property_reply_t,
+
 	pub encoding: xcb_atom_t,
 	pub name_len: u32,
 	pub name: *mut c_char,
@@ -14,14 +15,16 @@ pub struct xcb_icccm_get_text_property_reply_t {
 pub struct xcb_icccm_get_wm_colormap_windows_reply_t {
 	pub windows_len: u32,
 	pub windows: *mut xcb_window_t,
-	pub _reply: *mut xcb_get_property_reply_t,
+
+	_reply: *mut xcb_get_property_reply_t,
 }
 
 #[repr(C)]
 pub struct xcb_icccm_get_wm_class_reply_t {
 	pub instance_name: *mut c_char,
 	pub class_name: *mut c_char,
-	pub _reply: *mut xcb_get_property_reply_t,
+
+	_reply: *mut xcb_get_property_reply_t,
 }
 
 pub type xcb_icccm_size_hints_flags_t = u32;
@@ -98,7 +101,8 @@ pub const XCB_ICCCM_WM_ALL_HINTS:          xcb_icccm_wm_t =
 pub struct xcb_icccm_get_wm_protocols_reply_t {
 	pub atoms_len: u32,
 	pub atoms: *mut xcb_atom_t,
-	pub _reply: *mut xcb_get_property_reply_t,
+
+	_reply: *mut xcb_get_property_reply_t,
 }
 
 #[cfg_attr(feature = "static", link(name = "xcb-icccm", kind = "static"))]
