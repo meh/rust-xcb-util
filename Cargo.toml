@@ -16,3 +16,4 @@ xcb  = "0.7"
 [features]
 static = []
 icccm  = []
+image  = ["xcb/shm"]

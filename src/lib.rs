@@ -80,3 +80,6 @@ macro_rules! define {
 
 #[cfg(feature = "icccm")]
 pub mod icccm;
+
+#[cfg(feature = "image")]
+pub mod image;
