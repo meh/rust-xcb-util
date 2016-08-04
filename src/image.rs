@@ -3,6 +3,7 @@ use std::slice;
 
 use xcb;
 use ffi::image::*;
+use libc::{malloc, c_void, size_t};
 
 pub struct Image {
 	ptr:   *mut xcb_image_t,
@@ -115,6 +116,23 @@ impl Drop for Image {
 			}
 
 			xcb_image_destroy(self.ptr);
+		}
+	}
+}
+
+extern "C" {
+	fn memcpy(dest: *mut c_void, src: *const c_void, n: size_t) -> *mut c_void;
+}
+
+pub fn create<T: AsRef<[u8]>>(source: T, width: u32, height: u32) -> Image {
+	unsafe {
+		let source = source.as_ref();
+		let data   = malloc(source.len() as size_t);
+		memcpy(data, source.as_ptr() as *const _, source.len() as size_t);
+
+		Image {
+			ptr:   xcb_image_create_from_bitmap_data(data as *mut _, width, height),
+			owned: true,
 		}
 	}
 }
