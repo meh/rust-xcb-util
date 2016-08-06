@@ -1,109 +1,105 @@
-use std::ptr;
 use std::slice;
 
 use xcb;
 use ffi::image::*;
 use libc::{malloc, memcpy, size_t};
 
-pub struct Image {
-	ptr:   *mut xcb_image_t,
-	owned: bool,
-}
+pub struct Image(*mut xcb_image_t);
 
 impl Image {
 	pub fn annotate(&self) {
 		unsafe {
-			xcb_image_annotate(self.ptr)
+			xcb_image_annotate(self.0)
 		}
 	}
 
 	pub fn width(&self) -> u16 {
 		unsafe {
-			(*self.ptr).width
+			(*self.0).width
 		}
 	}
 
 	pub fn height(&self) -> u16 {
 		unsafe {
-			(*self.ptr).height
+			(*self.0).height
 		}
 	}
 
 	pub fn format(&self) -> xcb::ImageFormat {
 		unsafe {
-			(*self.ptr).format
+			(*self.0).format
 		}
 	}
 
 	pub fn scanline_pad(&self) -> u8 {
 		unsafe {
-			(*self.ptr).scanline_pad
+			(*self.0).scanline_pad
 		}
 	}
 
 	pub fn depth(&self) -> u8 {
 		unsafe {
-			(*self.ptr).depth
+			(*self.0).depth
 		}
 	}
 
 	pub fn bpp(&self) -> u8 {
 		unsafe {
-			(*self.ptr).bpp
+			(*self.0).bpp
 		}
 	}
 
 	pub fn unit(&self) -> u8 {
 		unsafe {
-			(*self.ptr).unit
+			(*self.0).unit
 		}
 	}
 
 	pub fn plane_mask(&self) -> u32 {
 		unsafe {
-			(*self.ptr).plane_mask
+			(*self.0).plane_mask
 		}
 	}
 
 	pub fn byte_order(&self) -> xcb::ImageOrder {
 		unsafe {
-			(*self.ptr).byte_order
+			(*self.0).byte_order
 		}
 	}
 
 	pub fn bit_order(&self) -> xcb::ImageOrder {
 		unsafe {
-			(*self.ptr).bit_order
+			(*self.0).bit_order
 		}
 	}
 
 	pub fn stride(&self) -> u32 {
 		unsafe {
-			(*self.ptr).stride
+			(*self.0).stride
 		}
 	}
 
 	pub fn size(&self) -> u32 {
 		unsafe {
-			(*self.ptr).size
+			(*self.0).size
 		}
 	}
 
 	pub fn data(&self) -> &[u8] {
 		unsafe {
-			slice::from_raw_parts((*self.ptr).data, (*self.ptr).size as usize)
+			slice::from_raw_parts((*self.0).data, (*self.0).size as usize)
 		}
 	}
 
 	pub fn put(&mut self, x: u32, y: u32, pixel: u32) {
 		unsafe {
-			xcb_image_put_pixel(self.ptr, x, y, pixel)
+			xcb_image_put_pixel(self.0, x, y, pixel)
 		}
 	}
 
 	pub fn get(&self, x: u32, y: u32) -> u32 {
 		unsafe {
-			xcb_image_get_pixel(self.ptr, x, y)
+			xcb_image_get_pixel(self.0, x, y)
 		}
 	}
 }
@@ -111,11 +107,7 @@ impl Image {
 impl Drop for Image {
 	fn drop(&mut self) {
 		unsafe {
-			if !self.owned {
-				(*self.ptr).data = ptr::null_mut();
-			}
-
-			xcb_image_destroy(self.ptr);
+			xcb_image_destroy(self.0);
 		}
 	}
 }
@@ -126,10 +118,7 @@ pub fn create<T: AsRef<[u8]>>(source: T, width: u32, height: u32) -> Image {
 		let data   = malloc(source.len() as size_t);
 		memcpy(data, source.as_ptr() as *const _, source.len() as size_t);
 
-		Image {
-			ptr:   xcb_image_create_from_bitmap_data(data as *mut _, width, height),
-			owned: true,
-		}
+		Image(xcb_image_create_from_bitmap_data(data as *mut _, width, height))
 	}
 }
 
@@ -141,10 +130,7 @@ pub fn get(c: &xcb::Connection, drawable: xcb::Drawable, x: i16, y: i16, width: 
 			Err(())
 		}
 		else {
-			Ok(Image {
-				ptr:   ptr,
-				owned: true,
-			})
+			Ok(Image(ptr))
 		}
 	}
 }
@@ -152,7 +138,7 @@ pub fn get(c: &xcb::Connection, drawable: xcb::Drawable, x: i16, y: i16, width: 
 pub fn put(c: &xcb::Connection, drawable: xcb::Drawable, gc: xcb::Gcontext, image: &Image, x: i16, y: i16) -> xcb::VoidCookie {
 	unsafe {
 		xcb::VoidCookie {
-			cookie:  xcb_image_put(c.get_raw_conn(), drawable, gc, image.ptr, x, y, 0),
+			cookie:  xcb_image_put(c.get_raw_conn(), drawable, gc, image.0, x, y, 0),
 			conn:    c.get_raw_conn(),
 			checked: false,
 		}
@@ -161,22 +147,19 @@ pub fn put(c: &xcb::Connection, drawable: xcb::Drawable, gc: xcb::Gcontext, imag
 
 pub fn is_native(c: &xcb::Connection, image: &Image) -> bool {
 	unsafe {
-		xcb_image_native(c.get_raw_conn(), image.ptr, 0) == image.ptr
+		xcb_image_native(c.get_raw_conn(), image.0, 0) == image.0
 	}
 }
 
 pub fn to_native(c: &xcb::Connection, image: &Image) -> Option<Image> {
 	unsafe {
-		let ptr = xcb_image_native(c.get_raw_conn(), image.ptr, 1);
+		let ptr = xcb_image_native(c.get_raw_conn(), image.0, 1);
 
-		if ptr == image.ptr || ptr.is_null() {
+		if ptr == image.0 || ptr.is_null() {
 			None
 		}
 		else {
-			Some(Image {
-				ptr:   ptr,
-				owned: true,
-			})
+			Some(Image(ptr))
 		}
 	}
 }
@@ -240,13 +223,9 @@ pub mod shm {
 
 			Ok(Image {
 				conn: c.get_raw_conn(),
+				base: super::Image(image),
 
-				base: super::Image {
-					ptr:   image,
-					owned: false,
-				},
-
-				shm:   xcb_shm_segment_info_t {
+				shm: xcb_shm_segment_info_t {
 					shmseg:  seg,
 					shmid:   id as u32,
 					shmaddr: addr as *mut _,
@@ -255,6 +234,34 @@ pub mod shm {
 				width:  width,
 				height: height,
 			})
+		}
+	}
+
+	impl Image {
+		pub fn resize(&mut self, width: u16, height: u16) {
+			assert!(width <= self.width && height <= self.height);
+
+			unsafe {
+				(*self.base.0).width  = width;
+				(*self.base.0).height = height;
+			}
+
+			self.annotate();
+		}
+
+		pub fn restore(&mut self) {
+			let width  = self.width;
+			let height = self.height;
+
+			self.resize(width, height);
+		}
+
+		pub fn actual_width(&self) -> u16 {
+			self.width
+		}
+
+		pub fn actual_height(&self) -> u16 {
+			self.height
 		}
 	}
 
@@ -282,28 +289,35 @@ pub mod shm {
 		}
 	}
 
-	pub fn get<'a>(c: &xcb::Connection, drawable: xcb::Drawable, image: &'a mut Image, x: i16, y: i16, width: u16, height: u16, plane_mask: u32) -> Result<&'a mut Image, ()> {
+	pub fn get<'a>(c: &xcb::Connection, drawable: xcb::Drawable, output: &'a mut Image, x: i16, y: i16, plane_mask: u32) -> Result<&'a mut Image, ()> {
 		unsafe {
-			assert!(width <= image.width && height <= image.height);
-
-			(*image.base.ptr).width = width;
-			(*image.base.ptr).height = height;
-
-			match xcb_image_shm_get(c.get_raw_conn(), drawable, image.base.ptr, image.shm, x, y, plane_mask) {
-				1 => Ok(image),
-				_ => Err(())
-			}
-		}
-	}
-
-	pub fn put<'a>(c: &xcb::Connection, drawable: xcb::Drawable, gc: xcb::Gcontext, image: &'a Image, src_x: i16, src_y: i16, dest_x: i16, dest_y: i16, src_width: u16, src_height: u16, send_event: bool) -> Result<&'a Image, ()> {
-		unsafe {
-			if !xcb_image_shm_put(c.get_raw_conn(), drawable, gc, image.base.ptr, image.shm, src_x, src_y, dest_x, dest_y, src_width, src_height, send_event as u8).is_null() {
-				Ok(image)
+			if xcb_image_shm_get(c.get_raw_conn(), drawable, output.base.0, output.shm, x, y, plane_mask) != 0 {
+				Ok(output)
 			}
 			else {
 				Err(())
 			}
 		}
+	}
+
+	pub fn put<'a>(c: &xcb::Connection, drawable: xcb::Drawable, gc: xcb::Gcontext, input: &'a Image, src_x: i16, src_y: i16, dest_x: i16, dest_y: i16, src_width: u16, src_height: u16, send_event: bool) -> Result<&'a Image, ()> {
+		unsafe {
+			if !xcb_image_shm_put(c.get_raw_conn(), drawable, gc, input.base.0, input.shm, src_x, src_y, dest_x, dest_y, src_width, src_height, send_event as u8).is_null() {
+				Ok(input)
+			}
+			else {
+				Err(())
+			}
+		}
+	}
+
+	/// Fetches an area from the given drawable.
+	///
+	/// For technical reasons the `output` is resized to fit the area, to restore
+	/// it to its original dimensions see `Image::restore`, the shared memory is
+	/// untouched.
+	pub fn area<'a>(c: &xcb::Connection, drawable: xcb::Drawable, output: &'a mut Image, x: i16, y: i16, width: u16, height: u16, plane_mask: u32) -> Result<&'a mut Image, ()> {
+		output.resize(width, height);
+		get(c, drawable, output, x, y, plane_mask)
 	}
 }
