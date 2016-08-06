@@ -196,6 +196,9 @@ pub mod shm {
 		conn: *mut xcb_connection_t,
 		base: super::Image,
 		shm:  xcb_shm_segment_info_t,
+
+		width:  u16,
+		height: u16,
 	}
 
 	pub fn create(c: &xcb::Connection, depth: u8, width: u16, height: u16) -> Result<Image, ()> {
@@ -247,7 +250,10 @@ pub mod shm {
 					shmseg:  seg,
 					shmid:   id as u32,
 					shmaddr: addr as *mut _,
-				}
+				},
+
+				width:  width,
+				height: height,
 			})
 		}
 	}
@@ -276,8 +282,13 @@ pub mod shm {
 		}
 	}
 
-	pub fn get<'a>(c: &xcb::Connection, drawable: xcb::Drawable, image: &'a mut Image, x: i16, y: i16, plane_mask: u32) -> Result<&'a mut Image, ()> {
+	pub fn get<'a>(c: &xcb::Connection, drawable: xcb::Drawable, image: &'a mut Image, x: i16, y: i16, width: u16, height: u16, plane_mask: u32) -> Result<&'a mut Image, ()> {
 		unsafe {
+			assert!(width <= image.width && height <= image.height);
+
+			(*image.base.ptr).width = width;
+			(*image.base.ptr).height = height;
+
 			match xcb_image_shm_get(c.get_raw_conn(), drawable, image.base.ptr, image.shm, x, y, plane_mask) {
 				1 => Ok(image),
 				_ => Err(())
