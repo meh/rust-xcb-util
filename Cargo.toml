@@ -18,4 +18,5 @@ static = []
 shm    = ["xcb/shm"]
 
 icccm = []
+ewmh  = []
 image = []

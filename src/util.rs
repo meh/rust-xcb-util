@@ -147,6 +147,35 @@ macro_rules! define {
 		}
 	);
 
+	(cookie $cookie:ident($inner:path) through $conn:ident with $func:ident as $reply:path) => (
+		pub struct $cookie($inner, *mut $conn);
+
+		impl $cookie {
+			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
+				unsafe {
+					if self.0.checked {
+						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
+						let mut reply = mem::uninitialized();
+						$func(self.1, self.0.cookie, &mut reply, &mut err);
+
+						if err.is_null() {
+							Ok(reply)
+						}
+						else {
+							Err(xcb::GenericError { ptr: err })
+						}
+					}
+					else {
+						let mut reply = mem::uninitialized();
+						$func(self.1, self.0.cookie, &mut reply, ptr::null_mut());
+
+						Ok(reply)
+					}
+				}
+			}
+		}
+	);
+
 	(reply $reply:ident for $inner:ident with $wipe:ident) => (
 		pub struct $reply($inner);
 
