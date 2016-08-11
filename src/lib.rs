@@ -6,7 +6,7 @@ extern crate libc;
 pub mod ffi;
 
 #[macro_use]
-pub mod util;
+mod util;
 
 #[cfg(feature = "icccm")]
 pub mod icccm;
