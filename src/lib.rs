@@ -16,3 +16,6 @@ pub mod ewmh;
 
 #[cfg(feature = "image")]
 pub mod image;
+
+#[cfg(feature = "cursor")]
+pub mod cursor;
