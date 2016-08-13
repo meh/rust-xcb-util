@@ -8,7 +8,7 @@ macro_rules! define {
 				unsafe {
 					if self.0.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-						let mut reply = mem::uninitialized();
+						let mut reply = mem::zeroed();
 						self.1(self.0.conn, self.0.cookie, &mut reply, &mut err);
 
 						if err.is_null() {
@@ -19,7 +19,7 @@ macro_rules! define {
 						}
 					}
 					else {
-						let mut reply = mem::uninitialized();
+						let mut reply = mem::zeroed();
 						self.1(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
 
 						Ok($reply(reply))
@@ -37,7 +37,7 @@ macro_rules! define {
 				unsafe {
 					if self.0.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-						let mut reply = mem::uninitialized();
+						let mut reply = mem::zeroed();
 						$func(self.0.conn, self.0.cookie, &mut reply, &mut err);
 
 						if err.is_null() {
@@ -48,7 +48,7 @@ macro_rules! define {
 						}
 					}
 					else {
-						let mut reply = mem::uninitialized();
+						let mut reply = mem::zeroed();
 						$func(self.0.conn, self.0.cookie, &mut reply, ptr::null_mut());
 
 						Ok($reply(reply))
@@ -59,17 +59,21 @@ macro_rules! define {
 	);
 
 	(cookie $cookie:ident through $conn:ident with $func:ident => $reply:ident) => (
-		pub struct $cookie(xcb::GetPropertyCookie, *mut $conn);
+		pub struct $cookie {
+			conn:    *mut $conn,
+			cookie:  xcb_get_property_cookie_t,
+			checked: bool,
+		}
 
 		impl $cookie {
 			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
 				unsafe {
-					if self.0.checked {
+					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-						let mut reply = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut reply, &mut err);
+						let mut reply = mem::zeroed();
+						let     res = $func(self.conn, self.cookie, &mut reply, &mut err);
 
-						if err.is_null() {
+						if err.is_null() && res != 0 {
 							Ok($reply(reply))
 						}
 						else {
@@ -77,8 +81,8 @@ macro_rules! define {
 						}
 					}
 					else {
-						let mut reply = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut reply, ptr::null_mut());
+						let mut reply = mem::zeroed();
+						$func(self.conn, self.cookie, &mut reply, ptr::null_mut());
 
 						Ok($reply(reply))
 					}
@@ -88,18 +92,22 @@ macro_rules! define {
 	);
 
 	(cookie $cookie:ident through $conn:ident with $func:ident as ($first:path, $second:path)) => (
-		pub struct $cookie(xcb::GetPropertyCookie, *mut $conn);
+		pub struct $cookie {
+			conn:    *mut $conn,
+			cookie:  xcb_get_property_cookie_t,
+			checked: bool,
+		}
 
 		impl $cookie {
 			pub fn get_reply(&self) -> Result<($first, $second), xcb::GenericError> {
 				unsafe {
-					if self.0.checked {
+					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-						let mut first = mem::uninitialized();
-						let mut second = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut first, &mut second, &mut err);
+						let mut first = mem::zeroed();
+						let mut second = mem::zeroed();
+						let     res = $func(self.conn, self.cookie, &mut first, &mut second, &mut err);
 
-						if err.is_null() {
+						if err.is_null() && res != 0 {
 							Ok((first, second))
 						}
 						else {
@@ -107,9 +115,9 @@ macro_rules! define {
 						}
 					}
 					else {
-						let mut first = mem::uninitialized();
-						let mut second = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut first, &mut second, ptr::null_mut());
+						let mut first = mem::zeroed();
+						let mut second = mem::zeroed();
+						$func(self.conn, self.cookie, &mut first, &mut second, ptr::null_mut());
 
 						Ok((first, second))
 					}
@@ -119,17 +127,21 @@ macro_rules! define {
 	);
 
 	(cookie $cookie:ident through $conn:ident with $func:ident as $reply:path) => (
-		pub struct $cookie(xcb::GetPropertyCookie, *mut $conn);
+		pub struct $cookie {
+			conn:    *mut $conn,
+			cookie:  xcb_get_property_cookie_t,
+			checked: bool,
+		}
 
 		impl $cookie {
 			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
 				unsafe {
-					if self.0.checked {
+					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-						let mut reply = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut reply, &mut err);
+						let mut reply = mem::zeroed();
+						let     res = $func(self.conn, self.cookie, &mut reply, &mut err);
 
-						if err.is_null() {
+						if err.is_null() && res != 0 {
 							Ok(reply)
 						}
 						else {
@@ -137,8 +149,8 @@ macro_rules! define {
 						}
 					}
 					else {
-						let mut reply = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut reply, ptr::null_mut());
+						let mut reply = mem::zeroed();
+						$func(self.conn, self.cookie, &mut reply, ptr::null_mut());
 
 						Ok(reply)
 					}
@@ -148,17 +160,21 @@ macro_rules! define {
 	);
 
 	(cookie $cookie:ident($inner:path) through $conn:ident with $func:ident as $reply:path) => (
-		pub struct $cookie($inner, *mut $conn);
+		pub struct $cookie {
+			conn:    *mut $conn,
+			cookie:  $inner,
+			checked: bool,
+		}
 
 		impl $cookie {
 			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
 				unsafe {
-					if self.0.checked {
+					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
-						let mut reply = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut reply, &mut err);
+						let mut reply = mem::zeroed();
+						let     res = $func(self.conn, self.cookie, &mut reply, &mut err);
 
-						if err.is_null() {
+						if err.is_null() && res != 0 {
 							Ok(reply)
 						}
 						else {
@@ -166,8 +182,8 @@ macro_rules! define {
 						}
 					}
 					else {
-						let mut reply = mem::uninitialized();
-						$func(self.1, self.0.cookie, &mut reply, ptr::null_mut());
+						let mut reply = mem::zeroed();
+						$func(self.conn, self.cookie, &mut reply, ptr::null_mut());
 
 						Ok(reply)
 					}
@@ -207,6 +223,24 @@ macro_rules! void {
 			cookie:  $cookie,
 			conn:    $conn.get_raw_conn(),
 			checked: true,
+		}
+	});
+}
+
+macro_rules! property {
+	(checked $name:ident -> $conn:expr, $cookie:expr) => (unsafe {
+		$name {
+			conn:    $conn.get_raw_conn(),
+			cookie:  $cookie,
+			checked: true,
+		}
+	});
+
+	(unchecked $name:ident -> $conn:expr, $cookie:expr) => (unsafe {
+		$name {
+			conn:    $conn.get_raw_conn(),
+			cookie:  $cookie,
+			checked: false,
 		}
 	});
 }

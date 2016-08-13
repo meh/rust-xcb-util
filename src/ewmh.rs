@@ -10,24 +10,6 @@ use ffi::ewmh::*;
 use libc::c_int;
 use util::utf8;
 
-macro_rules! property {
-	(checked $name:ident -> $conn:expr, $cookie:expr) => (unsafe {
-		$name(xcb::GetPropertyCookie {
-			cookie:  $cookie,
-			conn:    (**$conn).get_raw_conn(),
-			checked: true,
-		}, $conn.get_raw_conn())
-	});
-
-	(unchecked $name:ident -> $conn:expr, $cookie:expr) => (unsafe {
-		$name(xcb::GetPropertyCookie {
-			cookie:  $cookie,
-			conn:    (**$conn).get_raw_conn(),
-			checked: false,
-		}, $conn.get_raw_conn())
-	});
-}
-
 pub type Coordinates = xcb_ewmh_coordinates_t;
 
 impl Coordinates {
@@ -1275,6 +1257,14 @@ pub fn get_wm_desktop_unchecked(c: &Connection, window: xcb::Window) -> GetWmDes
 define!(cookie GetWmWindowTypeCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_window_type_reply => GetWmWindowTypeReply);
 define!(reply GetWmWindowTypeReply for xcb_ewmh_get_atoms_reply_t with xcb_ewmh_get_atoms_reply_wipe);
 
+impl GetWmWindowTypeReply {
+	pub fn atoms(&self) -> &[xcb::Atom] {
+		unsafe {
+			slice::from_raw_parts(self.0.atoms as *mut _, self.0.atoms_len as usize)
+		}
+	}
+}
+
 pub fn set_wm_window_type(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
 	void!(unchecked -> **c,
 		xcb_ewmh_set_wm_window_type(c.get_raw_conn(), window, list.len() as u32, list.as_ptr()))
@@ -1297,6 +1287,14 @@ pub fn get_wm_window_type_unchecked(c: &Connection, window: xcb::Window) -> GetW
 
 define!(cookie GetWmStateCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_state_reply => GetWmStateReply);
 define!(reply GetWmStateReply for xcb_ewmh_get_atoms_reply_t with xcb_ewmh_get_atoms_reply_wipe);
+
+impl GetWmStateReply {
+	pub fn atoms(&self) -> &[xcb::Atom] {
+		unsafe {
+			slice::from_raw_parts(self.0.atoms as *mut _, self.0.atoms_len as usize)
+		}
+	}
+}
 
 pub fn set_wm_state(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
 	void!(unchecked -> **c,
@@ -1325,6 +1323,14 @@ pub fn get_wm_state_unchecked(c: &Connection, window: xcb::Window) -> GetWmState
 
 define!(cookie GetWmAllowedActionsCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_allowed_actions_reply => GetWmAllowedActionsReply);
 define!(reply GetWmAllowedActionsReply for xcb_ewmh_get_atoms_reply_t with xcb_ewmh_get_atoms_reply_wipe);
+
+impl GetWmAllowedActionsReply {
+	pub fn atoms(&self) -> &[xcb::Atom] {
+		unsafe {
+			slice::from_raw_parts(self.0.atoms as *mut _, self.0.atoms_len as usize)
+		}
+	}
+}
 
 pub fn set_wm_allowed_actions(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
 	void!(unchecked -> **c,
@@ -1623,7 +1629,7 @@ pub fn get_wm_full_screen_monitors_unchecked(c: &Connection, window: xcb::Window
 		xcb_ewmh_get_wm_fullscreen_monitors_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmCmOwnerCookie(xcb::GetSelectionOwnerCookie) through xcb_ewmh_connection_t with xcb_ewmh_get_wm_cm_owner_reply as xcb::Window);
+define!(cookie GetWmCmOwnerCookie(xcb_get_selection_owner_cookie_t) through xcb_ewmh_connection_t with xcb_ewmh_get_wm_cm_owner_reply as xcb::Window);
 
 pub fn set_wm_cm_owner(c: &Connection, screen: i32, owner: xcb::Window, timestamp: xcb::Timestamp, first: u32, second: u32) -> xcb::VoidCookie {
 	void!(unchecked -> **c,
@@ -1637,20 +1643,20 @@ pub fn set_wm_cm_owner_checked(c: &Connection, screen: i32, owner: xcb::Window, 
 
 pub fn get_wm_cm_owner(c: &Connection, screen: i32) -> GetWmCmOwnerCookie {
 	unsafe {
-		GetWmCmOwnerCookie(xcb::GetSelectionOwnerCookie {
+		GetWmCmOwnerCookie {
+			conn:    c.get_raw_conn(),
 			cookie:  xcb_ewmh_get_wm_cm_owner(c.get_raw_conn(), screen as c_int),
-			conn:    (**c).get_raw_conn(),
 			checked: true,
-		}, c.get_raw_conn())
+		}
 	}
 }
 
 pub fn get_wm_cm_owner_unchecked(c: &Connection, screen: i32) -> GetWmCmOwnerCookie {
 	unsafe {
-		GetWmCmOwnerCookie(xcb::GetSelectionOwnerCookie {
+		GetWmCmOwnerCookie {
+			conn:    c.get_raw_conn(),
 			cookie:  xcb_ewmh_get_wm_cm_owner_unchecked(c.get_raw_conn(), screen as c_int),
-			conn:    (**c).get_raw_conn(),
 			checked: false,
-		}, c.get_raw_conn())
+		}
 	}
 }
