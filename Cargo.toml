@@ -17,6 +17,8 @@ xcb  = "0.7"
 static = []
 shm    = ["xcb/shm"]
 
-icccm = []
-ewmh  = []
-image = []
+icccm  = []
+ewmh   = []
+image  = []
+cursor = []
+misc   = ["icccm"]

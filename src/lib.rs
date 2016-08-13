@@ -19,3 +19,6 @@ pub mod image;
 
 #[cfg(feature = "cursor")]
 pub mod cursor;
+
+#[cfg(feature = "misc")]
+pub mod misc;
