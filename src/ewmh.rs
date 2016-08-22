@@ -688,29 +688,29 @@ impl Drop for Connection {
 	}
 }
 
-pub fn send_client_message(c: &xcb::Connection, window: xcb::Window, dest: xcb::Window, atom: xcb::Atom, data: &[u32]) -> xcb::VoidCookie {
+pub fn send_client_message<'a>(c: &'a xcb::Connection, window: xcb::Window, dest: xcb::Window, atom: xcb::Atom, data: &[u32]) -> xcb::VoidCookie<'a> {
 	void!(unchecked -> c,
 		xcb_ewmh_send_client_message(c.get_raw_conn(), window, dest, atom,
 			data.len() as u32, data.as_ptr()))
 }
 
 pub fn request_close_window(c: &Connection, screen: i32, window: xcb::Window, timestamp: xcb::Timestamp, source_indication: ClientSourceType) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_close_window(c.get_raw_conn(), screen as c_int, window, timestamp, source_indication))
 }
 
 pub fn request_move_resize_window(c: &Connection, screen: i32, window: xcb::Window, gravity: xcb::Gravity, source_indication: ClientSourceType, flags: MoveResizeWindowFlags, x: u32, y: u32, width: u32, height: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_moveresize_window(c.get_raw_conn(), screen as c_int, window,
 			gravity, source_indication, flags, x, y, width, height))
 }
 
 pub fn send_wm_ping(c: &Connection, window: xcb::Window, timestamp: xcb::Timestamp) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_send_wm_ping(c.get_raw_conn(), window, timestamp))
 }
 
-define!(cookie GetSupportedCookie through xcb_ewmh_connection_t with xcb_ewmh_get_supported_reply => GetSupportedReply);
+define!(cookie GetSupportedCookie through Connection with xcb_ewmh_get_supported_reply => GetSupportedReply);
 define!(reply GetSupportedReply for xcb_ewmh_get_atoms_reply_t with xcb_ewmh_get_atoms_reply_wipe);
 
 impl GetSupportedReply {
@@ -721,14 +721,14 @@ impl GetSupportedReply {
 	}
 }
 
-pub fn set_supported(c: &Connection, screen: i32, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_supported<'a>(c: &'a Connection, screen: i32, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_supported(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr()))
 }
 
-pub fn set_supported_checked(c: &Connection, screen: i32, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_supported_checked<'a>(c: &'a Connection, screen: i32, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_supported_checked(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr()))
 }
@@ -743,7 +743,7 @@ pub fn get_supported_unchecked(c: &Connection, screen: i32) -> GetSupportedCooki
 		xcb_ewmh_get_supported_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetClientListCookie through xcb_ewmh_connection_t with xcb_ewmh_get_client_list_reply => GetClientListReply);
+define!(cookie GetClientListCookie through Connection with xcb_ewmh_get_client_list_reply => GetClientListReply);
 define!(reply GetClientListReply for xcb_ewmh_get_windows_reply_t with xcb_ewmh_get_windows_reply_wipe);
 
 impl GetClientListReply {
@@ -754,14 +754,14 @@ impl GetClientListReply {
 	}
 }
 
-pub fn set_client_list(c: &Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_client_list<'a>(c: &'a Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_client_list(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr() as *const _))
 }
 
-pub fn set_client_list_checked(c: &Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_client_list_checked<'a>(c: &'a Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_client_list_checked(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr() as *const _))
 }
@@ -776,7 +776,7 @@ pub fn get_client_list_unchecked(c: &Connection, screen: i32) -> GetClientListCo
 		xcb_ewmh_get_client_list(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetClientListStackingCookie through xcb_ewmh_connection_t with xcb_ewmh_get_client_list_stacking_reply => GetClientListStackingReply);
+define!(cookie GetClientListStackingCookie through Connection with xcb_ewmh_get_client_list_stacking_reply => GetClientListStackingReply);
 define!(reply GetClientListStackingReply for xcb_ewmh_get_windows_reply_t with xcb_ewmh_get_windows_reply_wipe);
 
 impl GetClientListStackingReply {
@@ -787,14 +787,14 @@ impl GetClientListStackingReply {
 	}
 }
 
-pub fn set_client_list_stacking(c: &Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_client_list_stacking<'a>(c: &'a Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_client_list_stacking(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr() as *const _))
 }
 
-pub fn set_client_list_stacking_checked(c: &Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_client_list_stacking_checked<'a>(c: &'a Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_client_list_stacking_checked(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr() as *const _))
 }
@@ -809,15 +809,15 @@ pub fn get_client_list_stacking_unchecked(c: &Connection, screen: i32) -> GetCli
 		xcb_ewmh_get_client_list_stacking(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetNumberOfDesktopsCookie through xcb_ewmh_connection_t with xcb_ewmh_get_number_of_desktops_reply as u32);
+define!(cookie GetNumberOfDesktopsCookie through Connection with xcb_ewmh_get_number_of_desktops_reply as u32);
 
 pub fn set_number_of_desktops(c: &Connection, screen: i32, number: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_number_of_desktops(c.get_raw_conn(), screen as c_int, number))
 }
 
 pub fn set_number_of_desktops_checked(c: &Connection, screen: i32, number: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_number_of_desktops_checked(c.get_raw_conn(), screen as c_int, number))
 }
 
@@ -831,20 +831,20 @@ pub fn get_number_of_desktops_unchecked(c: &Connection, screen: i32) -> GetNumbe
 		xcb_ewmh_get_number_of_desktops_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetDesktopGeometryCookie through xcb_ewmh_connection_t with xcb_ewmh_get_desktop_geometry_reply as (u32, u32));
+define!(cookie GetDesktopGeometryCookie through Connection with xcb_ewmh_get_desktop_geometry_reply as (u32, u32));
 
 pub fn set_desktop_geometry(c: &Connection, screen: i32, width: u32, height: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_desktop_geometry(c.get_raw_conn(), screen as c_int, width, height))
 }
 
 pub fn set_desktop_geometry_checked(c: &Connection, screen: i32, width: u32, height: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_desktop_geometry_checked(c.get_raw_conn(), screen as c_int, width, height))
 }
 
 pub fn request_change_desktop_geometry(c: &Connection, screen: i32, width: u32, height: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_change_desktop_geometry(c.get_raw_conn(), screen as c_int, width, height))
 }
 
@@ -858,7 +858,7 @@ pub fn get_desktop_geometry_unchecked(c: &Connection, screen: i32) -> GetDesktop
 		xcb_ewmh_get_desktop_geometry_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetDesktopViewportCookie through xcb_ewmh_connection_t with xcb_ewmh_get_desktop_viewport_reply => GetDesktopViewportReply);
+define!(cookie GetDesktopViewportCookie through Connection with xcb_ewmh_get_desktop_viewport_reply => GetDesktopViewportReply);
 define!(reply GetDesktopViewportReply for xcb_ewmh_get_desktop_viewport_reply_t with xcb_ewmh_get_desktop_viewport_reply_wipe);
 
 impl GetDesktopViewportReply {
@@ -869,14 +869,14 @@ impl GetDesktopViewportReply {
 	}
 }
 
-pub fn set_desktop_viewport(c: &Connection, screen: i32, list: &[Coordinates]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_desktop_viewport<'a>(c: &'a Connection, screen: i32, list: &[Coordinates]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_desktop_viewport(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr()))
 }
 
-pub fn set_desktop_viewport_checked(c: &Connection, screen: i32, list: &[Coordinates]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_desktop_viewport_checked<'a>(c: &'a Connection, screen: i32, list: &[Coordinates]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_desktop_viewport_checked(c.get_raw_conn(), screen as c_int,
 			list.len() as u32, list.as_ptr()))
 }
@@ -891,20 +891,20 @@ pub fn get_desktop_viewport_unchecked(c: &Connection, screen: i32) -> GetDesktop
 		xcb_ewmh_get_desktop_viewport_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetCurrentDesktopCookie through xcb_ewmh_connection_t with xcb_ewmh_get_current_desktop_reply as u32);
+define!(cookie GetCurrentDesktopCookie through Connection with xcb_ewmh_get_current_desktop_reply as u32);
 
 pub fn set_current_desktop(c: &Connection, screen: i32, current_desktop: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_current_desktop(c.get_raw_conn(), screen as c_int, current_desktop))
 }
 
 pub fn set_current_desktop_checked(c: &Connection, screen: i32, current_desktop: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_current_desktop_checked(c.get_raw_conn(), screen as c_int, current_desktop))
 }
 
 pub fn request_change_current_desktop(c: &Connection, screen: i32, current_desktop: u32, timestamp: xcb::Timestamp) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_change_current_desktop(c.get_raw_conn(), screen as c_int, current_desktop, timestamp))
 }
 
@@ -918,7 +918,7 @@ pub fn get_current_desktop_unchecked(c: &Connection, screen: i32) -> GetCurrentD
 		xcb_ewmh_get_current_desktop_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetDesktopNamesCookie through xcb_ewmh_connection_t with xcb_ewmh_get_desktop_names_reply => GetDesktopNamesReply);
+define!(cookie GetDesktopNamesCookie through Connection with xcb_ewmh_get_desktop_names_reply => GetDesktopNamesReply);
 define!(reply GetDesktopNamesReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh_get_utf8_strings_reply_wipe);
 
 impl GetDesktopNamesReply {
@@ -930,14 +930,14 @@ impl GetDesktopNamesReply {
 pub fn set_desktop_names<'a, T: IntoIterator<Item=&'a str>>(c: &Connection, screen: i32, list: T) -> xcb::VoidCookie {
 	let value = utf8::from(list);
 
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_desktop_names(c.get_raw_conn(), screen, value.len() as u32, value.as_ptr() as *mut _))
 }
 
 pub fn set_desktop_names_checked<'a, T: IntoIterator<Item=&'a str>>(c: &Connection, screen: i32, list: T) -> xcb::VoidCookie {
 	let value = utf8::from(list);
 
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_desktop_names_checked(c.get_raw_conn(), screen, value.len() as u32, value.as_ptr() as *mut _))
 }
 
@@ -951,20 +951,20 @@ pub fn get_desktop_names_unchecked(c: &Connection, screen: i32) -> GetDesktopNam
 		xcb_ewmh_get_desktop_names_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetActiveWindowCookie through xcb_ewmh_connection_t with xcb_ewmh_get_active_window_reply as xcb::Window);
+define!(cookie GetActiveWindowCookie through Connection with xcb_ewmh_get_active_window_reply as xcb::Window);
 
 pub fn set_active_window(c: &Connection, screen: i32, window: xcb::Window) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_active_window(c.get_raw_conn(), screen as c_int, window))
 }
 
 pub fn set_active_window_checked(c: &Connection, screen: i32, window: xcb::Window) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_active_window_checked(c.get_raw_conn(), screen as c_int, window))
 }
 
 pub fn request_change_active_window(c: &Connection, screen: i32, window: xcb::Window, source_indication: ClientSourceType, timestamp: xcb::Timestamp, current: xcb::Window) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_change_active_window(c.get_raw_conn(), screen as c_int, window,
 			source_indication, timestamp, current))
 }
@@ -979,7 +979,7 @@ pub fn get_active_window_unchecked(c: &Connection, screen: i32) -> GetActiveWind
 		xcb_ewmh_get_active_window_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetWorkAreaCookie through xcb_ewmh_connection_t with xcb_ewmh_get_workarea_reply => GetWorkAreaReply);
+define!(cookie GetWorkAreaCookie through Connection with xcb_ewmh_get_workarea_reply => GetWorkAreaReply);
 define!(reply GetWorkAreaReply for xcb_ewmh_get_workarea_reply_t with xcb_ewmh_get_workarea_reply_wipe);
 
 impl GetWorkAreaReply {
@@ -990,13 +990,13 @@ impl GetWorkAreaReply {
 	}
 }
 
-pub fn set_work_area(c: &Connection, screen: i32, list: &[Geometry]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_work_area<'a>(c: &'a Connection, screen: i32, list: &[Geometry]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_workarea(c.get_raw_conn(), screen as c_int, list.len() as u32, list.as_ptr()))
 }
 
-pub fn set_work_area_checked(c: &Connection, screen: i32, list: &[Geometry]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_work_area_checked<'a>(c: &'a Connection, screen: i32, list: &[Geometry]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_workarea_checked(c.get_raw_conn(), screen as c_int, list.len() as u32, list.as_ptr()))
 }
 
@@ -1010,15 +1010,15 @@ pub fn get_work_area_unchecked(c: &Connection, screen: i32) -> GetWorkAreaCookie
 		xcb_ewmh_get_workarea_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetSupportingWmCheckCookie through xcb_ewmh_connection_t with xcb_ewmh_get_supporting_wm_check_reply as xcb::Window);
+define!(cookie GetSupportingWmCheckCookie through Connection with xcb_ewmh_get_supporting_wm_check_reply as xcb::Window);
 
 pub fn set_supporting_wm_check(c: &Connection, parent: xcb::Window, child: xcb::Window) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_supporting_wm_check(c.get_raw_conn(), parent, child))
 }
 
 pub fn set_supporting_wm_check_checked(c: &Connection, parent: xcb::Window, child: xcb::Window) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_supporting_wm_check_checked(c.get_raw_conn(), parent, child))
 }
 
@@ -1032,16 +1032,16 @@ pub fn get_supporting_wm_check_unchecked(c: &Connection, window: xcb::Window) ->
 		xcb_ewmh_get_supporting_wm_check_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetVirtualRootsCookie through xcb_ewmh_connection_t with xcb_ewmh_get_virtual_roots_reply => GetVirtualRootsReply);
+define!(cookie GetVirtualRootsCookie through Connection with xcb_ewmh_get_virtual_roots_reply => GetVirtualRootsReply);
 define!(reply GetVirtualRootsReply for xcb_ewmh_get_windows_reply_t with xcb_ewmh_get_windows_reply_wipe);
 
-pub fn set_virtual_roots(c: &Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_virtual_roots<'a>(c: &'a Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_virtual_roots(c.get_raw_conn(), screen as c_int, list.len() as u32, list.as_ptr()))
 }
 
-pub fn set_virtual_roots_checked(c: &Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_virtual_roots_checked<'a>(c: &'a Connection, screen: i32, list: &[xcb::Window]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_virtual_roots_checked(c.get_raw_conn(), screen as c_int, list.len() as u32, list.as_ptr()))
 }
 
@@ -1055,7 +1055,7 @@ pub fn get_virtual_roots_unchecked(c: &Connection, screen: i32) -> GetVirtualRoo
 		xcb_ewmh_get_virtual_roots_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetDesktopLayoutCookie through xcb_ewmh_connection_t with xcb_ewmh_get_desktop_layout_reply => GetDesktopLayoutReply);
+define!(cookie GetDesktopLayoutCookie through Connection with xcb_ewmh_get_desktop_layout_reply => GetDesktopLayoutReply);
 define!(reply GetDesktopLayoutReply for xcb_ewmh_get_desktop_layout_reply_t);
 
 impl GetDesktopLayoutReply {
@@ -1077,12 +1077,12 @@ impl GetDesktopLayoutReply {
 }
 
 pub fn set_desktop_layout(c: &Connection, screen: i32, orientation: DesktopLayoutOrientation, columns: u32, rows: u32, starting_corner: DesktopLayoutStartingCorner) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_desktop_layout(c.get_raw_conn(), screen as c_int, orientation, columns, rows, starting_corner))
 }
 
 pub fn set_desktop_layout_checked(c: &Connection, screen: i32, orientation: DesktopLayoutOrientation, columns: u32, rows: u32, starting_corner: DesktopLayoutStartingCorner) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_desktop_layout_checked(c.get_raw_conn(), screen as c_int, orientation, columns, rows, starting_corner))
 }
 
@@ -1096,15 +1096,15 @@ pub fn get_desktop_layout_unchecked(c: &Connection, screen: i32) -> GetDesktopLa
 		xcb_ewmh_get_desktop_layout_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetShowingDesktopCookie through xcb_ewmh_connection_t with xcb_ewmh_get_showing_desktop_reply as u32);
+define!(cookie GetShowingDesktopCookie through Connection with xcb_ewmh_get_showing_desktop_reply as u32);
 
 pub fn set_showing_desktop(c: &Connection, screen: i32, desktop: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_showing_desktop(c.get_raw_conn(), screen as c_int, desktop))
 }
 
 pub fn set_showing_desktop_checked(c: &Connection, screen: i32, desktop: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_showing_desktop_checked(c.get_raw_conn(), screen as c_int, desktop))
 }
 
@@ -1118,20 +1118,20 @@ pub fn get_showing_desktop_unchecked(c: &Connection, screen: i32) -> GetShowingD
 		xcb_ewmh_get_showing_desktop_unchecked(c.get_raw_conn(), screen as c_int))
 }
 
-define!(cookie GetWmNameCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_name_reply => GetWmNameReply);
+define!(cookie GetWmNameCookie through Connection with xcb_ewmh_get_wm_name_reply => GetWmNameReply);
 define!(reply GetWmNameReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh_get_utf8_strings_reply_wipe);
 
 pub fn set_wm_name<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_name(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
 pub fn set_wm_name_checked<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_name_checked(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
@@ -1145,20 +1145,20 @@ pub fn get_wm_name_unchecked(c: &Connection, window: xcb::Window) -> GetWmNameCo
 		xcb_ewmh_get_wm_name_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmVisibleNameCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_visible_name_reply => GetWmVisibleNameReply);
+define!(cookie GetWmVisibleNameCookie through Connection with xcb_ewmh_get_wm_visible_name_reply => GetWmVisibleNameReply);
 define!(reply GetWmVisibleNameReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh_get_utf8_strings_reply_wipe);
 
 pub fn set_wm_visible_name<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_visible_name(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
 pub fn set_wm_visible_name_checked<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_visible_name_checked(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
@@ -1172,20 +1172,20 @@ pub fn get_wm_visible_name_unchecked(c: &Connection, window: xcb::Window) -> Get
 		xcb_ewmh_get_wm_visible_name_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmIconNameCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_icon_name_reply => GetWmIconNameReply);
+define!(cookie GetWmIconNameCookie through Connection with xcb_ewmh_get_wm_icon_name_reply => GetWmIconNameReply);
 define!(reply GetWmIconNameReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh_get_utf8_strings_reply_wipe);
 
 pub fn set_wm_icon_name<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_icon_name(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
 pub fn set_wm_icon_name_checked<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_icon_name_checked(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
@@ -1199,20 +1199,20 @@ pub fn get_wm_icon_name_unchecked(c: &Connection, window: xcb::Window) -> GetWmI
 		xcb_ewmh_get_wm_icon_name_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmVisibleIconNameCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_visible_icon_name_reply => GetWmVisibleIconNameReply);
+define!(cookie GetWmVisibleIconNameCookie through Connection with xcb_ewmh_get_wm_visible_icon_name_reply => GetWmVisibleIconNameReply);
 define!(reply GetWmVisibleIconNameReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh_get_utf8_strings_reply_wipe);
 
 pub fn set_wm_visible_icon_name<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_visible_icon_name(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
 pub fn set_wm_visible_icon_name_checked<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = utf8::from(vec![name.as_ref()]);
 
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_visible_icon_name_checked(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
@@ -1226,20 +1226,20 @@ pub fn get_wm_visible_icon_name_unchecked(c: &Connection, window: xcb::Window) -
 		xcb_ewmh_get_wm_visible_icon_name_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmDesktopCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_desktop_reply as u32);
+define!(cookie GetWmDesktopCookie through Connection with xcb_ewmh_get_wm_desktop_reply as u32);
 
 pub fn set_wm_desktop(c: &Connection, window: xcb::Window, number: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_desktop(c.get_raw_conn(), window, number))
 }
 
 pub fn set_wm_desktop_checked(c: &Connection, window: xcb::Window, number: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_desktop_checked(c.get_raw_conn(), window, number))
 }
 
 pub fn request_change_wm_desktop(c: &Connection, screen: i32, window: xcb::Window, desktop: u32, source_indication: ClientSourceType) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_change_wm_desktop(c.get_raw_conn(), screen as c_int, window,
 			desktop, source_indication))
 }
@@ -1254,7 +1254,7 @@ pub fn get_wm_desktop_unchecked(c: &Connection, window: xcb::Window) -> GetWmDes
 		xcb_ewmh_get_wm_desktop_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmWindowTypeCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_window_type_reply => GetWmWindowTypeReply);
+define!(cookie GetWmWindowTypeCookie through Connection with xcb_ewmh_get_wm_window_type_reply => GetWmWindowTypeReply);
 define!(reply GetWmWindowTypeReply for xcb_ewmh_get_atoms_reply_t with xcb_ewmh_get_atoms_reply_wipe);
 
 impl GetWmWindowTypeReply {
@@ -1265,13 +1265,13 @@ impl GetWmWindowTypeReply {
 	}
 }
 
-pub fn set_wm_window_type(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_wm_window_type<'a>(c: &'a Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_window_type(c.get_raw_conn(), window, list.len() as u32, list.as_ptr()))
 }
 
-pub fn set_wm_window_type_checked(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_wm_window_type_checked<'a>(c: &'a Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_wm_window_type_checked(c.get_raw_conn(), window, list.len() as u32, list.as_ptr()))
 }
 
@@ -1285,7 +1285,7 @@ pub fn get_wm_window_type_unchecked(c: &Connection, window: xcb::Window) -> GetW
 		xcb_ewmh_get_wm_window_type_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmStateCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_state_reply => GetWmStateReply);
+define!(cookie GetWmStateCookie through Connection with xcb_ewmh_get_wm_state_reply => GetWmStateReply);
 define!(reply GetWmStateReply for xcb_ewmh_get_atoms_reply_t with xcb_ewmh_get_atoms_reply_wipe);
 
 impl GetWmStateReply {
@@ -1296,18 +1296,18 @@ impl GetWmStateReply {
 	}
 }
 
-pub fn set_wm_state(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_wm_state<'a>(c: &'a Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_state(c.get_raw_conn(), window, list.len() as u32, list.as_ptr()))
 }
 
-pub fn set_wm_state_checked(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_wm_state_checked<'a>(c: &'a Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_wm_state_checked(c.get_raw_conn(), window, list.len() as u32, list.as_ptr()))
 }
 
 pub fn request_change_wm_state(c: &Connection, screen: i32, window: xcb::Window, action: StateAction, first: xcb::Atom, second: xcb::Atom, source_indication: ClientSourceType) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_change_wm_state(c.get_raw_conn(), screen as c_int, window, action, first, second, source_indication))
 }
 
@@ -1321,7 +1321,7 @@ pub fn get_wm_state_unchecked(c: &Connection, window: xcb::Window) -> GetWmState
 		xcb_ewmh_get_wm_state_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmAllowedActionsCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_allowed_actions_reply => GetWmAllowedActionsReply);
+define!(cookie GetWmAllowedActionsCookie through Connection with xcb_ewmh_get_wm_allowed_actions_reply => GetWmAllowedActionsReply);
 define!(reply GetWmAllowedActionsReply for xcb_ewmh_get_atoms_reply_t with xcb_ewmh_get_atoms_reply_wipe);
 
 impl GetWmAllowedActionsReply {
@@ -1332,13 +1332,13 @@ impl GetWmAllowedActionsReply {
 	}
 }
 
-pub fn set_wm_allowed_actions(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_wm_allowed_actions<'a>(c: &'a Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_allowed_actions(c.get_raw_conn(), window, list.len() as u32, list.as_ptr()))
 }
 
-pub fn set_wm_allowed_actions_checked(c: &Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_wm_allowed_actions_checked<'a>(c: &'a Connection, window: xcb::Window, list: &[xcb::Atom]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_wm_allowed_actions_checked(c.get_raw_conn(), window, list.len() as u32, list.as_ptr()))
 }
 
@@ -1352,15 +1352,15 @@ pub fn get_wm_allowed_actions_unchecked(c: &Connection, window: xcb::Window) -> 
 		xcb_ewmh_get_wm_allowed_actions_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmStrutCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_strut_reply as Extents);
+define!(cookie GetWmStrutCookie through Connection with xcb_ewmh_get_wm_strut_reply as Extents);
 
 pub fn set_wm_strut(c: &Connection, window: xcb::Window, left: u32, right: u32, top: u32, bottom: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_strut(c.get_raw_conn(), window, left, right, top, bottom))
 }
 
 pub fn set_wm_strut_checked(c: &Connection, window: xcb::Window, left: u32, right: u32, top: u32, bottom: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_strut_checked(c.get_raw_conn(), window, left, right, top, bottom))
 }
 
@@ -1374,15 +1374,15 @@ pub fn get_wm_strut_unchecked(c: &Connection, window: xcb::Window) -> GetWmStrut
 		xcb_ewmh_get_wm_strut(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmStrutPartialCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_strut_partial_reply as StrutPartial);
+define!(cookie GetWmStrutPartialCookie through Connection with xcb_ewmh_get_wm_strut_partial_reply as StrutPartial);
 
 pub fn set_wm_strut_partial(c: &Connection, window: xcb::Window, partial: StrutPartial) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_strut_partial(c.get_raw_conn(), window, partial))
 }
 
 pub fn set_wm_strut_partial_checked(c: &Connection, window: xcb::Window, partial: StrutPartial) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_strut_partial_checked(c.get_raw_conn(), window, partial))
 }
 
@@ -1396,15 +1396,15 @@ pub fn get_wm_strut_partial_unchecked(c: &Connection, window: xcb::Window) -> Ge
 		xcb_ewmh_get_wm_strut_partial(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmIconGeometryCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_icon_geometry_reply as Geometry);
+define!(cookie GetWmIconGeometryCookie through Connection with xcb_ewmh_get_wm_icon_geometry_reply as Geometry);
 
 pub fn set_wm_icon_geometry(c: &Connection, window: xcb::Window, left: u32, right: u32, top: u32, bottom: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_icon_geometry(c.get_raw_conn(), window, left, right, top, bottom))
 }
 
 pub fn set_wm_icon_geometry_checked(c: &Connection, window: xcb::Window, left: u32, right: u32, top: u32, bottom: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_icon_geometry_checked(c.get_raw_conn(), window, left, right, top, bottom))
 }
 
@@ -1418,7 +1418,7 @@ pub fn get_wm_icon_geometry_unchecked(c: &Connection, window: xcb::Window) -> Ge
 		xcb_ewmh_get_wm_icon_geometry_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmIconCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_icon_reply => GetWmIconReply);
+define!(cookie GetWmIconCookie through Connection with xcb_ewmh_get_wm_icon_reply => GetWmIconReply);
 define!(reply GetWmIconReply for xcb_ewmh_get_wm_icon_reply_t with xcb_ewmh_get_wm_icon_reply_wipe);
 
 impl GetWmIconReply {
@@ -1435,23 +1435,23 @@ impl GetWmIconReply {
 	}
 }
 
-pub fn set_wm_icon(c: &Connection, mode: u8, window: xcb::Window, data: &[u32]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn set_wm_icon<'a>(c: &'a Connection, mode: u8, window: xcb::Window, data: &[u32]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_icon(c.get_raw_conn(), mode, window, data.len() as u32, data.as_ptr()))
 }
 
-pub fn set_wm_icon_checked(c: &Connection, mode: u8, window: xcb::Window, data: &[u32]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn set_wm_icon_checked<'a>(c: &'a Connection, mode: u8, window: xcb::Window, data: &[u32]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_set_wm_icon_checked(c.get_raw_conn(), mode, window, data.len() as u32, data.as_ptr()))
 }
 
-pub fn append_wm_icon(c: &Connection, window: xcb::Window, width: u32, height: u32, img: &[u32]) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+pub fn append_wm_icon<'a>(c: &'a Connection, window: xcb::Window, width: u32, height: u32, img: &[u32]) -> xcb::VoidCookie<'a> {
+	void!(unchecked -> c,
 		xcb_ewmh_append_wm_icon(c.get_raw_conn(), window, width, height, img.len() as u32, img.as_ptr()))
 }
 
-pub fn append_wm_icon_checked(c: &Connection, window: xcb::Window, width: u32, height: u32, img: &[u32]) -> xcb::VoidCookie {
-	void!(checked -> **c,
+pub fn append_wm_icon_checked<'a>(c: &'a Connection, window: xcb::Window, width: u32, height: u32, img: &[u32]) -> xcb::VoidCookie<'a> {
+	void!(checked -> c,
 		xcb_ewmh_append_wm_icon_checked(c.get_raw_conn(), window, width, height, img.len() as u32, img.as_ptr()))
 }
 
@@ -1465,15 +1465,15 @@ pub fn get_wm_icon_unchecked(c: &Connection, window: xcb::Window) -> GetWmIconCo
 		xcb_ewmh_get_wm_icon_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmPidCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_pid_reply as u32);
+define!(cookie GetWmPidCookie through Connection with xcb_ewmh_get_wm_pid_reply as u32);
 
 pub fn set_wm_pid(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_pid(c.get_raw_conn(), window, pid))
 }
 
 pub fn set_wm_pid_checked(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_pid_checked(c.get_raw_conn(), window, pid))
 }
 
@@ -1487,15 +1487,15 @@ pub fn get_wm_pid_unchecked(c: &Connection, window: xcb::Window) -> GetWmPidCook
 		xcb_ewmh_get_wm_pid_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmHandledIconsCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_handled_icons_reply as u32);
+define!(cookie GetWmHandledIconsCookie through Connection with xcb_ewmh_get_wm_handled_icons_reply as u32);
 
 pub fn set_wm_handled_icons(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_handled_icons(c.get_raw_conn(), window, pid))
 }
 
 pub fn set_wm_handled_icons_checked(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_handled_icons_checked(c.get_raw_conn(), window, pid))
 }
 
@@ -1509,15 +1509,15 @@ pub fn get_wm_handled_icons_unchecked(c: &Connection, window: xcb::Window) -> Ge
 		xcb_ewmh_get_wm_handled_icons_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmUserTimeCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_user_time_reply as u32);
+define!(cookie GetWmUserTimeCookie through Connection with xcb_ewmh_get_wm_user_time_reply as u32);
 
 pub fn set_wm_user_time(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_user_time(c.get_raw_conn(), window, pid))
 }
 
 pub fn set_wm_user_time_checked(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_user_time_checked(c.get_raw_conn(), window, pid))
 }
 
@@ -1531,15 +1531,15 @@ pub fn get_wm_user_time_unchecked(c: &Connection, window: xcb::Window) -> GetWmU
 		xcb_ewmh_get_wm_user_time_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmUserTimeWindowCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_user_time_window_reply as u32);
+define!(cookie GetWmUserTimeWindowCookie through Connection with xcb_ewmh_get_wm_user_time_window_reply as u32);
 
 pub fn set_wm_user_time_window(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_user_time_window(c.get_raw_conn(), window, pid))
 }
 
 pub fn set_wm_user_time_window_checked(c: &Connection, window: xcb::Window, pid: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_user_time_window_checked(c.get_raw_conn(), window, pid))
 }
 
@@ -1553,15 +1553,15 @@ pub fn get_wm_user_time_window_unchecked(c: &Connection, window: xcb::Window) ->
 		xcb_ewmh_get_wm_user_time_window_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetFrameExtentsCookie through xcb_ewmh_connection_t with xcb_ewmh_get_frame_extents_reply as Extents);
+define!(cookie GetFrameExtentsCookie through Connection with xcb_ewmh_get_frame_extents_reply as Extents);
 
 pub fn set_frame_extents(c: &Connection, window: xcb::Window, left: u32, right: u32, top: u32, bottom: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_frame_extents(c.get_raw_conn(), window, left, right, top, bottom))
 }
 
 pub fn set_frame_extents_checked(c: &Connection, window: xcb::Window, left: u32, right: u32, top: u32, bottom: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_frame_extents_checked(c.get_raw_conn(), window, left, right, top, bottom))
 }
 
@@ -1575,20 +1575,20 @@ pub fn get_frame_extents_unchecked(c: &Connection, window: xcb::Window) -> GetFr
 		xcb_ewmh_get_frame_extents_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmSyncRequestCounterCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_sync_request_counter_reply as u64);
+define!(cookie GetWmSyncRequestCounterCookie through Connection with xcb_ewmh_get_wm_sync_request_counter_reply as u64);
 
 pub fn set_wm_sync_request_counter(c: &Connection, window: xcb::Window, atom: xcb::Atom, low: u32, high: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_sync_request_counter(c.get_raw_conn(), window, atom, low, high))
 }
 
 pub fn set_wm_sync_request_counter_checked(c: &Connection, window: xcb::Window, atom: xcb::Atom, low: u32, high: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_sync_request_counter_checked(c.get_raw_conn(), window, atom, low, high))
 }
 
 pub fn send_wm_sync_request(c: &Connection, window: xcb::Window, wm_protocols: xcb::Atom, wm_sync_request: xcb::Atom, timestamp: xcb::Timestamp, counter: u64) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_send_wm_sync_rqeuest(c.get_raw_conn(), window, wm_protocols, wm_sync_request, timestamp, counter))
 }
 
@@ -1602,20 +1602,20 @@ pub fn get_wm_sync_request_counter_unchecked(c: &Connection, window: xcb::Window
 		xcb_ewmh_get_wm_sync_request_counter_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmFullScreenMonitorsCookie through xcb_ewmh_connection_t with xcb_ewmh_get_wm_fullscreen_monitors_reply as WmFullScreenMonitors);
+define!(cookie GetWmFullScreenMonitorsCookie through Connection with xcb_ewmh_get_wm_fullscreen_monitors_reply as WmFullScreenMonitors);
 
 pub fn set_wm_full_screen_monitors(c: &Connection, window: xcb::Window, top: u32, bottom: u32, left: u32, right: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_fullscreen_monitors(c.get_raw_conn(), window, top, bottom, left, right))
 }
 
 pub fn set_wm_full_screen_monitors_checked(c: &Connection, window: xcb::Window, top: u32, bottom: u32, left: u32, right: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_fullscreen_monitors_checked(c.get_raw_conn(), window, top, bottom, left, right))
 }
 
 pub fn request_change_wm_full_screen_monitors(c: &Connection, screen: i32, window: xcb::Window, top: u32, bottom: u32, left: u32, right: u32, source_indication: ClientSourceType) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_request_change_wm_fullscreen_monitors(c.get_raw_conn(), screen as c_int, window, top, bottom, left, right, source_indication))
 }
 
@@ -1629,22 +1629,22 @@ pub fn get_wm_full_screen_monitors_unchecked(c: &Connection, window: xcb::Window
 		xcb_ewmh_get_wm_fullscreen_monitors_unchecked(c.get_raw_conn(), window))
 }
 
-define!(cookie GetWmCmOwnerCookie(xcb_get_selection_owner_cookie_t) through xcb_ewmh_connection_t with xcb_ewmh_get_wm_cm_owner_reply as xcb::Window);
+define!(cookie GetWmCmOwnerCookie(xcb_get_selection_owner_cookie_t) through Connection with xcb_ewmh_get_wm_cm_owner_reply as xcb::Window);
 
 pub fn set_wm_cm_owner(c: &Connection, screen: i32, owner: xcb::Window, timestamp: xcb::Timestamp, first: u32, second: u32) -> xcb::VoidCookie {
-	void!(unchecked -> **c,
+	void!(unchecked -> c,
 		xcb_ewmh_set_wm_cm_owner(c.get_raw_conn(), screen as c_int, owner, timestamp, first, second))
 }
 
 pub fn set_wm_cm_owner_checked(c: &Connection, screen: i32, owner: xcb::Window, timestamp: xcb::Timestamp, first: u32, second: u32) -> xcb::VoidCookie {
-	void!(checked -> **c,
+	void!(checked -> c,
 		xcb_ewmh_set_wm_cm_owner_checked(c.get_raw_conn(), screen as c_int, owner, timestamp, first, second))
 }
 
 pub fn get_wm_cm_owner(c: &Connection, screen: i32) -> GetWmCmOwnerCookie {
 	unsafe {
 		GetWmCmOwnerCookie {
-			conn:    c.get_raw_conn(),
+			conn:    c,
 			cookie:  xcb_ewmh_get_wm_cm_owner(c.get_raw_conn(), screen as c_int),
 			checked: true,
 		}
@@ -1654,7 +1654,7 @@ pub fn get_wm_cm_owner(c: &Connection, screen: i32) -> GetWmCmOwnerCookie {
 pub fn get_wm_cm_owner_unchecked(c: &Connection, screen: i32) -> GetWmCmOwnerCookie {
 	unsafe {
 		GetWmCmOwnerCookie {
-			conn:    c.get_raw_conn(),
+			conn:    c,
 			cookie:  xcb_ewmh_get_wm_cm_owner_unchecked(c.get_raw_conn(), screen as c_int),
 			checked: false,
 		}

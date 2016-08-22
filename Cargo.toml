@@ -16,6 +16,7 @@ xcb  = "0.7"
 [features]
 static = []
 shm    = ["xcb/shm"]
+thread = ["xcb/thread"]
 
 icccm  = []
 ewmh   = []

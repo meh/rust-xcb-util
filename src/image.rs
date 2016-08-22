@@ -6,6 +6,11 @@ use libc::{malloc, memcpy, size_t};
 
 pub struct Image(*mut xcb_image_t);
 
+#[cfg(feature = "thread")]
+unsafe impl Send for Image { }
+#[cfg(feature = "thread")]
+unsafe impl Sync for Image { }
+
 impl Image {
 	pub fn annotate(&self) {
 		unsafe {
@@ -135,11 +140,11 @@ pub fn get(c: &xcb::Connection, drawable: xcb::Drawable, x: i16, y: i16, width: 
 	}
 }
 
-pub fn put(c: &xcb::Connection, drawable: xcb::Drawable, gc: xcb::Gcontext, image: &Image, x: i16, y: i16) -> xcb::VoidCookie {
+pub fn put<'a>(c: &'a xcb::Connection, drawable: xcb::Drawable, gc: xcb::Gcontext, image: &Image, x: i16, y: i16) -> xcb::VoidCookie<'a> {
 	unsafe {
 		xcb::VoidCookie {
 			cookie:  xcb_image_put(c.get_raw_conn(), drawable, gc, image.0, x, y, 0),
-			conn:    c.get_raw_conn(),
+			conn:    c,
 			checked: false,
 		}
 	}
@@ -183,6 +188,11 @@ pub mod shm {
 		width:  u16,
 		height: u16,
 	}
+
+	#[cfg(feature = "thread")]
+	unsafe impl Send for Image { }
+	#[cfg(feature = "thread")]
+	unsafe impl Sync for Image { }
 
 	pub fn create(c: &xcb::Connection, depth: u8, width: u16, height: u16) -> Result<Image, ()> {
 		unsafe {
