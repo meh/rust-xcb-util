@@ -227,6 +227,11 @@ pub struct Connection {
 	ewmh: xcb_ewmh_connection_t,
 }
 
+#[cfg(feature = "thread")]
+unsafe impl<'a> Send for Connection { }
+#[cfg(feature = "thread")]
+unsafe impl<'a> Sync for Connection { }
+
 impl Connection {
 	pub fn connect(xcb: xcb::Connection) -> Result<Connection, (xcb::GenericError, xcb::Connection)> {
 		unsafe {
