@@ -7,6 +7,7 @@ use std::ffi::CStr;
 use xcb;
 use xcb::ffi::*;
 use ffi::icccm::*;
+use util::utf8;
 
 macro_rules! property {
 	(checked $name:ident with $func:ident -> $conn:expr, $cookie:expr) => (unsafe {
@@ -77,19 +78,19 @@ pub fn get_text_property_unchecked(c: &xcb::Connection, window: xcb::Window, pro
 		xcb_icccm_get_text_property_unchecked(c.get_raw_conn(), window, property))
 }
 
-pub fn set_wm_name<T: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, encoding: xcb::Atom, format: u8, name: T) -> xcb::VoidCookie {
+pub fn set_wm_name<T: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let name = name.as_ref();
 
 	void!(unchecked -> c,
-		xcb_icccm_set_wm_name(c.get_raw_conn(), window, encoding, format,
+		xcb_icccm_set_wm_name(c.get_raw_conn(), window, xcb::ATOM_STRING, 8,
 			name.len() as u32, name.as_bytes().as_ptr() as *const _))
 }
 
-pub fn set_wm_name_checked<T: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, encoding: xcb::Atom, format: u8, name: T) -> xcb::VoidCookie {
+pub fn set_wm_name_checked<T: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let name = name.as_ref();
 
 	void!(checked -> c,
-		xcb_icccm_set_wm_name_checked(c.get_raw_conn(), window, encoding, format,
+		xcb_icccm_set_wm_name_checked(c.get_raw_conn(), window, xcb::ATOM_STRING, 8,
 			name.len() as u32, name.as_bytes().as_ptr() as *const _))
 }
 
@@ -200,20 +201,20 @@ impl GetWmClassReply {
 	}
 }
 
-pub fn set_wm_class<T: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
-	let name = name.as_ref();
+pub fn set_wm_class<A: AsRef<str>, B: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, class: A, instance: B) -> xcb::VoidCookie {
+	let value = utf8::from(vec![class.as_ref(), instance.as_ref()]);
 
 	void!(unchecked -> c,
 		xcb_icccm_set_wm_class(c.get_raw_conn(), window,
-			name.len() as u32, name.as_bytes().as_ptr() as *const _))
+			value.len() as u32, value.as_ptr() as *const _))
 }
 
-pub fn set_wm_class_checked<T: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
-	let name = name.as_ref();
+pub fn set_wm_class_checked<A: AsRef<str>, B: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, class: A, instance: B) -> xcb::VoidCookie {
+	let value = utf8::from(vec![class.as_ref(), instance.as_ref()]);
 
 	void!(checked -> c,
 		xcb_icccm_set_wm_class_checked(c.get_raw_conn(), window,
-			name.len() as u32, name.as_bytes().as_ptr() as *const _))
+			value.len() as u32, value.as_ptr() as *const _))
 }
 
 pub fn get_wm_class(c: &xcb::Connection, window: xcb::Window) -> GetWmClassCookie {
