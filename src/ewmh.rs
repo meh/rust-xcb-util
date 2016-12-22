@@ -1127,14 +1127,14 @@ define!(cookie GetWmNameCookie through Connection with xcb_ewmh_get_wm_name_repl
 define!(reply GetWmNameReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh_get_utf8_strings_reply_wipe);
 
 pub fn set_wm_name<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
-	let value = utf8::from(vec![name.as_ref()]);
+	let value = name.as_ref();
 
 	void!(unchecked -> c,
 		xcb_ewmh_set_wm_name(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
 }
 
 pub fn set_wm_name_checked<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
-	let value = utf8::from(vec![name.as_ref()]);
+	let value = name.as_ref();
 
 	void!(checked -> c,
 		xcb_ewmh_set_wm_name_checked(c.get_raw_conn(), window, value.len() as u32, value.as_ptr() as *mut _))
