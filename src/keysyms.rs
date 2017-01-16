@@ -1,4 +1,4 @@
-use std::slice;
+use std::ptr;
 
 use xcb;
 use ffi::keysyms::*;
@@ -21,12 +21,16 @@ impl Iterator for KeyCode {
     type Item = xcb::Keycode;
     fn next(&mut self) -> Option<xcb::Keycode> {
         unsafe {
-            match *self.ptr.offset(self.index) {
-                0 => None, // pub const NO_SYMBOL: u32 = 0
-                keycode => {
-                    self.index += 1;
-                    Some(keycode)
+            if self.ptr != ptr::null_mut() {
+                match *self.ptr.offset(self.index) {
+                    0 => None, // pub const NO_SYMBOL: u32 = 0
+                    keycode => {
+                        self.index += 1;
+                        Some(keycode)
+                    }
                 }
+            } else {
+                None
             }
         }
     }
