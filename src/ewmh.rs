@@ -1126,6 +1126,12 @@ pub fn get_showing_desktop_unchecked(c: &Connection, screen: i32) -> GetShowingD
 define!(cookie GetWmNameCookie through Connection with xcb_ewmh_get_wm_name_reply => GetWmNameReply);
 define!(reply GetWmNameReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh_get_utf8_strings_reply_wipe);
 
+impl GetWmNameReply {
+	pub fn string(&self) -> &str {
+		utf8::into(self.0.strings, self.0.strings_len)[0]
+	}
+}
+
 pub fn set_wm_name<T: AsRef<str>>(c: &Connection, window: xcb::Window, name: T) -> xcb::VoidCookie {
 	let value = name.as_ref();
 
