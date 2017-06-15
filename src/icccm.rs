@@ -642,13 +642,13 @@ pub fn set_wm_protocols_checked<'a>(c: &'a xcb::Connection, window: xcb::Window,
 			list.len() as u32, list.as_ptr() as *const _))
 }
 
-pub fn get_wm_protocols(c: &xcb::Connection, window: xcb::Window, protocols: xcb::Atom) -> GetWmColormapWindowsCookie {
-	property!(checked GetWmColormapWindowsCookie -> c,
+pub fn get_wm_protocols(c: &xcb::Connection, window: xcb::Window, protocols: xcb::Atom) -> GetWmProtocolsCookie {
+	property!(checked GetWmProtocolsCookie -> c,
 		xcb_icccm_get_wm_protocols(c.get_raw_conn(), window, protocols))
 }
 
-pub fn get_wm_protocols_unchecked(c: &xcb::Connection, window: xcb::Window, protocols: xcb::Atom) -> GetWmColormapWindowsCookie {
-	property!(unchecked GetWmColormapWindowsCookie -> c,
+pub fn get_wm_protocols_unchecked(c: &xcb::Connection, window: xcb::Window, protocols: xcb::Atom) -> GetWmProtocolsCookie {
+	property!(unchecked GetWmProtocolsCookie -> c,
 		xcb_icccm_get_wm_protocols_unchecked(c.get_raw_conn(), window, protocols))
 }
 
