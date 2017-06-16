@@ -1128,7 +1128,7 @@ define!(reply GetWmNameReply for xcb_ewmh_get_utf8_strings_reply_t with xcb_ewmh
 
 impl GetWmNameReply {
 	pub fn string(&self) -> &str {
-		utf8::into(self.0.strings, self.0.strings_len)[0]
+		utf8::into(self.0.strings, self.0.strings_len).get(0).unwrap_or(&"")
 	}
 }
 
