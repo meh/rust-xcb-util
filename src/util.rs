@@ -281,9 +281,20 @@ pub mod utf8 {
 	use libc::c_char;
 
 	pub fn into<'a>(data: *const c_char, length: u32) -> Vec<&'a str> {
+		if length == 0 {
+			return Vec::new();
+		}
 		unsafe {
-			str::from_utf8_unchecked(slice::from_raw_parts(data as *mut u8, length as usize - 1))
-				.split('\0').collect()
+			let mut strs = str::from_utf8_unchecked(slice::from_raw_parts(data as *mut u8, length as usize))
+				.split('\0')
+				.collect::<Vec<_>>();
+			// data is sometimes null-terminated and sometimes not. If there is
+			// a null terminator, then our call to .split() will result in an
+			// extra empty-string element at the end.
+			if let Some(&"") = strs.last() {
+				strs.pop();
+			}
+			strs
 		}
 	}
 
