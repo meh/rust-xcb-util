@@ -1,6 +1,6 @@
 [package]
 name    = "xcb-util"
-version = "0.1.8"
+version = "0.2.0"
 
 authors = ["meh. <meh@schizofreni.co>"]
 license = "MIT"
@@ -11,7 +11,7 @@ keywords    = ["x11", "xcb"]
 
 [dependencies]
 libc = "0.2"
-xcb  = "0.7"
+xcb  = "0.8"
 
 [features]
 static = []
