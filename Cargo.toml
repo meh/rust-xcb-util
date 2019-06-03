@@ -1,6 +1,6 @@
 [package]
 name    = "xcb-util"
-version = "0.2.0"
+version = "0.2.0+1"
 
 authors = ["meh. <meh@schizofreni.co>"]
 license = "MIT"
@@ -24,3 +24,6 @@ image   = []
 cursor  = []
 keysyms = []
 misc    = ["icccm"]
+
+[package.metadata.docs.rs]
+all-features = true
