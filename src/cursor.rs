@@ -92,11 +92,11 @@ pub fn create_font_cursor(c: &xcb::Connection, glyph: u16) -> xcb::Cursor {
 
 pub fn create_font_cursor_checked(c: &xcb::Connection, glyph: u16) -> Result<xcb::Cursor, xcb::GenericError> {
 	let font = c.generate_id();
-	try!(xcb::open_font_checked(c, font, "cursor").request_check());
+	xcb::open_font_checked(c, font, "cursor").request_check()?;
 
 	let cursor = c.generate_id();
-	try!(xcb::create_glyph_cursor(c, cursor, font, font, glyph, glyph + 1,
-		0, 0, 0, 0xffff, 0xffff, 0xffff).request_check());
+	xcb::create_glyph_cursor(c, cursor, font, font, glyph, glyph + 1,
+		0, 0, 0, 0xffff, 0xffff, 0xffff).request_check()?;
 
 	Ok(cursor)
 }

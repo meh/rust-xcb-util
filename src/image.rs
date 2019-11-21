@@ -197,7 +197,7 @@ pub mod shm {
 	pub fn create(c: &xcb::Connection, depth: u8, width: u16, height: u16) -> Result<Image, ()> {
 		unsafe {
 			let setup  = c.get_setup();
-			let format = try!(setup.pixmap_formats().find(|f| f.depth() == depth).ok_or(()));
+			let format = setup.pixmap_formats().find(|f| f.depth() == depth).ok_or(())?;
 			let image  = xcb_image_create(width, height, xcb::IMAGE_FORMAT_Z_PIXMAP,
 				format.scanline_pad(), format.depth(), format.bits_per_pixel(),
 				setup.bitmap_format_scanline_unit(), setup.image_byte_order() as u32, setup.bitmap_format_bit_order() as u32,

@@ -14,9 +14,9 @@ macro_rules! define {
 					if self.0.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
 						let mut reply = mem::zeroed();
-						self.1(self.0.conn.get_raw_conn(), self.0.cookie, &mut reply, &mut err);
+						let     res = self.1(self.0.conn.get_raw_conn(), self.0.cookie, &mut reply, &mut err);
 
-						if err.is_null() {
+						if err.is_null() && res != 0 {
 							Ok($reply(reply))
 						}
 						else {
@@ -48,9 +48,9 @@ macro_rules! define {
 					if self.0.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
 						let mut reply = mem::zeroed();
-						$func(self.0.conn.get_raw_conn(), self.0.cookie, &mut reply, &mut err);
+						let     res = $func(self.0.conn.get_raw_conn(), self.0.cookie, &mut reply, &mut err);
 
-						if err.is_null() {
+						if err.is_null() && res != 0 {
 							Ok($reply(reply))
 						}
 						else {

@@ -657,7 +657,7 @@ pub struct GetWmStateReply(xcb::GetPropertyReply);
 
 impl<'a> GetWmStateCookie<'a> {
 	pub fn get_reply(&self) -> Result<GetWmStateReply, xcb::GenericError> {
-		let reply = try!(self.0.get_reply());
+		let reply = self.0.get_reply()?;
 		
 		if reply.type_() == xcb::ATOM_NONE {
 			Err(xcb::GenericError { ptr: ptr::null_mut() })

@@ -235,7 +235,7 @@ unsafe impl<'a> Sync for Connection { }
 impl Connection {
 	pub fn connect(xcb: xcb::Connection) -> Result<Connection, (xcb::GenericError, xcb::Connection)> {
 		unsafe {
-			let mut ewmh = mem::uninitialized();
+			let mut ewmh = mem::zeroed();
 			let mut err: *mut xcb_generic_error_t = ptr::null_mut();
 
 			let cookie = xcb_ewmh_init_atoms(xcb.get_raw_conn(), &mut ewmh);
