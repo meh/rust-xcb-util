@@ -202,7 +202,7 @@ impl GetWmClassReply {
 }
 
 pub fn set_wm_class<A: AsRef<str>, B: AsRef<str>>(c: &xcb::Connection, window: xcb::Window, class: A, instance: B) -> xcb::VoidCookie {
-	let value = utf8::from(vec![class.as_ref(), instance.as_ref()]);
+	let value = utf8::from(vec![instance.as_ref(), class.as_ref()]);
 
 	void!(unchecked -> c,
 		xcb_icccm_set_wm_class(c.get_raw_conn(), window,
