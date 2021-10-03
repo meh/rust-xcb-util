@@ -25,3 +25,6 @@ pub mod keysyms;
 
 #[cfg(feature = "misc")]
 pub mod misc;
+
+#[cfg(feature = "render")]
+pub mod render;
