@@ -90,7 +90,7 @@ pub fn create_font_cursor(c: &xcb::Connection, glyph: u16) -> xcb::Cursor {
 	cursor
 }
 
-pub fn create_font_cursor_checked(c: &xcb::Connection, glyph: u16) -> Result<xcb::Cursor, xcb::GenericError> {
+pub fn create_font_cursor_checked(c: &xcb::Connection, glyph: u16) -> Result<xcb::Cursor, xcb::ReplyError> {
 	let font = c.generate_id();
 	xcb::open_font_checked(c, font, "cursor").request_check()?;
 
