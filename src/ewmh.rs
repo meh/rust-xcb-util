@@ -233,7 +233,7 @@ unsafe impl<'a> Send for Connection { }
 unsafe impl<'a> Sync for Connection { }
 
 impl Connection {
-	pub fn connect(xcb: xcb::Connection) -> Result<Connection, (xcb::GenericError, xcb::Connection)> {
+	pub fn connect(xcb: xcb::Connection) -> Result<Connection, (xcb::ReplyError, xcb::Connection)> {
 		unsafe {
 			let mut ewmh = mem::zeroed();
 			let mut err: *mut xcb_generic_error_t = ptr::null_mut();
@@ -248,7 +248,7 @@ impl Connection {
 				})
 			}
 			else {
-				Err((xcb::GenericError { ptr: err }, xcb))
+				Err((xcb::ReplyError::GenericError(xcb::GenericError { ptr: err }), xcb))
 			}
 		}
 	}
