@@ -9,7 +9,7 @@ macro_rules! define {
 		unsafe impl<'a> Sync for $cookie<'a> { }
 
 		impl<'a> $cookie<'a> {
-			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
+			pub fn get_reply(&self) -> Result<$reply, xcb::ReplyError> {
 				unsafe {
 					if self.0.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
@@ -20,7 +20,7 @@ macro_rules! define {
 							Ok($reply(reply))
 						}
 						else {
-							Err(xcb::GenericError { ptr: err })
+							Err(xcb::ReplyError::GenericError(xcb::GenericError { ptr: err }))
 						}
 					}
 					else {
@@ -43,7 +43,7 @@ macro_rules! define {
 		unsafe impl<'a> Sync for $cookie<'a> { }
 
 		impl<'a> $cookie<'a> {
-			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
+			pub fn get_reply(&self) -> Result<$reply, xcb::ReplyError> {
 				unsafe {
 					if self.0.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
@@ -54,7 +54,7 @@ macro_rules! define {
 							Ok($reply(reply))
 						}
 						else {
-							Err(xcb::GenericError { ptr: err })
+							Err(xcb::ReplyError::GenericError(xcb::GenericError { ptr: err }))
 						}
 					}
 					else {
@@ -81,7 +81,7 @@ macro_rules! define {
 		unsafe impl<'a> Sync for $cookie<'a> { }
 
 		impl<'a> $cookie<'a> {
-			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
+			pub fn get_reply(&self) -> Result<$reply, xcb::ReplyError> {
 				unsafe {
 					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
@@ -92,7 +92,7 @@ macro_rules! define {
 							Ok($reply(reply))
 						}
 						else {
-							Err(xcb::GenericError { ptr: err })
+							Err(xcb::ReplyError::GenericError(xcb::GenericError { ptr: err }))
 						}
 					}
 					else {
@@ -119,7 +119,7 @@ macro_rules! define {
 		unsafe impl<'a> Sync for $cookie<'a> { }
 
 		impl<'a> $cookie<'a> {
-			pub fn get_reply(&self) -> Result<($first, $second), xcb::GenericError> {
+			pub fn get_reply(&self) -> Result<($first, $second), xcb::ReplyError> {
 				unsafe {
 					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
@@ -131,7 +131,7 @@ macro_rules! define {
 							Ok((first, second))
 						}
 						else {
-							Err(xcb::GenericError { ptr: err })
+							Err(xcb::ReplyError::GenericError(xcb::GenericError { ptr: err }))
 						}
 					}
 					else {
@@ -159,7 +159,7 @@ macro_rules! define {
 		unsafe impl<'a> Sync for $cookie<'a> { }
 
 		impl<'a> $cookie<'a> {
-			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
+			pub fn get_reply(&self) -> Result<$reply, xcb::ReplyError> {
 				unsafe {
 					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
@@ -170,7 +170,7 @@ macro_rules! define {
 							Ok(reply)
 						}
 						else {
-							Err(xcb::GenericError { ptr: err })
+							Err(xcb::ReplyError::GenericError(xcb::GenericError { ptr: err }))
 						}
 					}
 					else {
@@ -197,7 +197,7 @@ macro_rules! define {
 		unsafe impl<'a> Sync for $cookie<'a> { }
 
 		impl<'a> $cookie<'a> {
-			pub fn get_reply(&self) -> Result<$reply, xcb::GenericError> {
+			pub fn get_reply(&self) -> Result<$reply, xcb::ReplyError> {
 				unsafe {
 					if self.checked {
 						let mut err: *mut xcb_generic_error_t = ptr::null_mut();
@@ -208,7 +208,7 @@ macro_rules! define {
 							Ok(reply)
 						}
 						else {
-							Err(xcb::GenericError { ptr: err })
+							Err(xcb::ReplyError::GenericError(xcb::GenericError { ptr: err }))
 						}
 					}
 					else {
