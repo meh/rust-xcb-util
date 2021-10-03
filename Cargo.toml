@@ -24,6 +24,7 @@ image   = []
 cursor  = []
 keysyms = []
 misc    = ["icccm"]
+render  = []
 
 [package.metadata.docs.rs]
 all-features = true
